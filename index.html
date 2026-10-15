@@ -7,9 +7,7 @@
 
     <style>
         /* 전체 화면의 기본 설정 */
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -17,9 +15,7 @@
             color: #222;
         }
 
-        button {
-            font: inherit;
-        }
+        button { font: inherit; }
 
         /* 왼쪽 시설 목록과 오른쪽 지도를 나누는 영역 */
         .app-container {
@@ -29,7 +25,6 @@
             overflow: hidden;
         }
 
-        /* 왼쪽 사이드바 */
         .sidebar {
             display: flex;
             flex-direction: column;
@@ -40,9 +35,7 @@
             z-index: 1;
         }
 
-        .header {
-            padding: 22px 20px 16px;
-        }
+        .header { padding: 22px 20px 16px; }
 
         .header h1 {
             margin: 0 0 8px;
@@ -74,9 +67,7 @@
             cursor: pointer;
         }
 
-        .tool-button:hover {
-            background: #f7f7f7;
-        }
+        .tool-button:hover { background: #f7f7f7; }
 
         .tool-button.active {
             border-color: #e5bb00;
@@ -89,7 +80,7 @@
             cursor: not-allowed;
         }
 
-        /* 공공기관 / 문화시설 탭 */
+        /* 공공기관과 문화시설을 선택하는 탭 */
         .tab-list {
             display: flex;
             gap: 8px;
@@ -110,4 +101,1216 @@
 
         .tab-button[aria-selected="true"] {
             border-color: #f0ca00;
-            background:
+            background: #fee500;
+            color: #222;
+        }
+
+        /* 현재 위치 및 검색 상태 안내 */
+        .status-message {
+            padding: 11px 20px;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            background: #fafafa;
+            color: #666;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .result-list {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            margin: 0;
+            padding: 10px 12px;
+            list-style: none;
+        }
+
+        .empty-message {
+            padding: 28px 10px;
+            color: #888;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .place-card {
+            padding: 13px 9px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .place-main {
+            display: block;
+            width: 100%;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .place-main:hover .place-name { color: #927900; }
+
+        .place-name {
+            display: block;
+            margin-bottom: 6px;
+            color: #222;
+            font-size: 15px;
+            font-weight: bold;
+            line-height: 1.45;
+        }
+
+        .place-category {
+            display: block;
+            margin-bottom: 6px;
+            color: #967900;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .place-address {
+            display: block;
+            color: #666;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* 오른쪽 지도 영역 */
+        .map-container {
+            flex: 1;
+            min-width: 0;
+            height: 100%;
+            background: #eee;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 위치 권한을 안내하는 시작 화면 */
+        .start-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(20, 27, 39, 0.62);
+        }
+
+        .start-card {
+            width: 100%;
+            max-width: 460px;
+            padding: 28px;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 16px 55px rgba(0, 0, 0, 0.22);
+        }
+
+        .start-card h2 {
+            margin: 0 0 12px;
+            font-size: 23px;
+        }
+
+        .start-card p {
+            margin: 0 0 12px;
+            color: #555;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .permission-note {
+            padding: 12px;
+            border-radius: 10px;
+            background: #f6f7f9;
+            font-size: 13px !important;
+        }
+
+        .start-status {
+            min-height: 20px;
+            color: #925f00 !important;
+            font-size: 13px !important;
+        }
+
+        .start-button {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            padding: 13px 12px;
+            border: 0;
+            border-radius: 9px;
+            background: #fee500;
+            color: #222;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .start-button:disabled {
+            opacity: .6;
+            cursor: wait;
+        }
+
+        .secondary-button { background: #f0f1f3; }
+
+        /* 작은 화면에서는 목록 위, 지도를 아래에 배치 */
+        @media (max-width: 600px) {
+            .app-container { flex-direction: column; }
+
+            .sidebar {
+                width: 100%;
+                min-width: 0;
+                height: 48%;
+                border-right: 0;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .header { padding: 13px 16px 10px; }
+            .header h1 { font-size: 19px; }
+            .tool-buttons { padding: 0 16px 10px; }
+            .tab-list { padding: 0 16px 10px; }
+            .status-message { padding: 8px 16px; }
+            .result-list { padding: 5px 10px; }
+
+            .map-container {
+                width: 100%;
+                height: 52%;
+                min-height: 0;
+            }
+
+            .start-card { padding: 23px; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 지도 실행 전에 위치 권한을 확인하고 요청하는 화면 -->
+    <div id="startOverlay" class="start-overlay">
+        <section
+            class="start-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="startTitle"
+        >
+            <h2 id="startTitle">내 주변 공공시설 지도</h2>
+
+            <p>
+                주변 공공기관과 문화시설을 정확하게 찾으려면
+                기기의 현재 위치가 필요해요.
+            </p>
+
+            <p class="permission-note" id="permissionHelp">
+                아래 버튼을 누르면 브라우저의 위치 권한 요청이 시작돼요.
+                허용하면 현재 위치를 받은 뒤 지도를 열어요.
+                위치 권한은 언제든 브라우저 설정에서 바꿀 수 있어요.
+            </p>
+
+            <p
+                id="permissionStatus"
+                class="start-status"
+                role="status"
+                aria-live="polite"
+            ></p>
+
+            <button
+                id="allowLocationButton"
+                class="start-button"
+                type="button"
+            >
+                현재 위치 허용하고 시작
+            </button>
+
+            <button
+                id="fallbackButton"
+                class="start-button secondary-button"
+                type="button"
+            >
+                위치 없이 서울시청 기준으로 시작
+            </button>
+        </section>
+    </div>
+
+    <div class="app-container">
+        <!-- 왼쪽 공공시설 목록과 기능 -->
+        <aside class="sidebar">
+            <div class="header">
+                <h1>내 주변 공공시설</h1>
+                <p>현재 위치를 기준으로 반경 5km 안의 시설을 찾아요.</p>
+            </div>
+
+            <div class="tool-buttons">
+                <button
+                    id="currentLocationButton"
+                    class="tool-button"
+                    type="button"
+                    disabled
+                >
+                    ◎ 현재 위치
+                </button>
+
+                <button
+                    id="trafficButton"
+                    class="tool-button"
+                    type="button"
+                    aria-pressed="false"
+                    disabled
+                >
+                    교통정보 OFF
+                </button>
+            </div>
+
+            <!-- 공공기관 PO3 / 문화시설 CT1 -->
+            <div
+                class="tab-list"
+                role="tablist"
+                aria-label="시설 종류 선택"
+            >
+                <button
+                    id="publicTab"
+                    class="tab-button"
+                    type="button"
+                    role="tab"
+                    data-category="PO3"
+                    aria-selected="true"
+                    disabled
+                >
+                    공공기관
+                </button>
+
+                <button
+                    id="cultureTab"
+                    class="tab-button"
+                    type="button"
+                    role="tab"
+                    data-category="CT1"
+                    aria-selected="false"
+                    disabled
+                >
+                    문화시설
+                </button>
+            </div>
+
+            <div
+                id="statusMessage"
+                class="status-message"
+                role="status"
+                aria-live="polite"
+            >
+                위치 권한 확인 후 지도를 시작해 주세요.
+            </div>
+
+            <ul id="resultList" class="result-list">
+                <li class="empty-message">
+                    지도가 준비되면 주변 시설을 표시할게요.
+                </li>
+            </ul>
+        </aside>
+
+        <!-- 오른쪽 지도 -->
+        <main class="map-container">
+            <div id="map" aria-label="내 주변 공공시설 지도"></div>
+        </main>
+    </div>
+
+    <script>
+        // 카카오 JavaScript 키
+        const KAKAO_APP_KEY =
+            "469981822ad5e0ed9fbb12a18f32669e";
+
+        // 현재 위치를 확인하지 못했을 때 사용할 기본 위치: 서울시청
+        const DEFAULT_LATITUDE = 37.5665;
+        const DEFAULT_LONGITUDE = 126.9780;
+
+        // 주변 시설 검색 반경(미터)
+        const SEARCH_RADIUS = 5000;
+
+        // 지도와 검색 기능에 사용할 변수
+        let map = null;
+        let placesService = null;
+        let infoWindow = null;
+
+        let placeMarkers = [];
+        let currentLocationMarker = null;
+        let currentAccuracyCircle = null;
+        let currentPosition = null;
+
+        // SDK를 불러오기 전에는 위도와 경도를 숫자로 저장
+        let currentLatitude = null;
+        let currentLongitude = null;
+        let currentAccuracyMeters = null;
+
+        let locationReady = false;
+        let hasRealLocation = false;
+        let mapReady = false;
+        let trafficVisible = false;
+        let activeCategory = "PO3";
+        let searchRequestId = 0;
+        let sdkStarted = false;
+        let locationRequestInProgress = false;
+
+        let locationDescription = "현재 위치 확인 중";
+
+        // HTML 요소 가져오기
+        const startOverlay =
+            document.getElementById("startOverlay");
+
+        const permissionHelp =
+            document.getElementById("permissionHelp");
+
+        const permissionStatus =
+            document.getElementById("permissionStatus");
+
+        const allowLocationButton =
+            document.getElementById("allowLocationButton");
+
+        const fallbackButton =
+            document.getElementById("fallbackButton");
+
+        const statusMessage =
+            document.getElementById("statusMessage");
+
+        const resultList =
+            document.getElementById("resultList");
+
+        const currentLocationButton =
+            document.getElementById("currentLocationButton");
+
+        const trafficButton =
+            document.getElementById("trafficButton");
+
+        const categoryTabs =
+            document.querySelectorAll(".tab-button");
+
+
+        // 지도 상태 안내 문구 변경
+        function setStatus(message) {
+            statusMessage.textContent = message;
+        }
+
+
+        // 시작 화면의 안내 문구 변경
+        function setPermissionStatus(message) {
+            permissionStatus.textContent = message;
+        }
+
+
+        // 위치 오차를 미터 또는 킬로미터로 표시
+        function formatAccuracy(meters) {
+            if (!Number.isFinite(meters)) {
+                return "알 수 없음";
+            }
+
+            if (meters >= 1000) {
+                return (meters / 1000).toFixed(1) + "km";
+            }
+
+            return Math.round(meters) + "m";
+        }
+
+
+        // 현재 선택된 탭의 시설 종류 이름 가져오기
+        function getCategoryName(code) {
+            return code === "PO3" ? "공공기관" : "문화시설";
+        }
+
+
+        // 시작 전에 브라우저의 위치 권한 상태를 확인
+        async function inspectLocationPermission() {
+            if (!window.isSecureContext) {
+                permissionHelp.textContent =
+                    "현재 페이지가 보안 연결(HTTPS 또는 localhost)이 아닐 수 있어요. " +
+                    "브라우저가 위치 정보를 차단할 수 있으니 " +
+                    "Live Server의 localhost 또는 HTTPS 주소로 실행해 주세요.";
+            }
+
+            if (!navigator.geolocation) {
+                permissionHelp.textContent =
+                    "이 브라우저에서는 위치 기능을 사용할 수 없어요. " +
+                    "서울시청 기준으로 시작할 수 있어요.";
+
+                setPermissionStatus(
+                    "현재 위치 버튼을 사용하려면 위치 기능을 지원하는 브라우저가 필요해요."
+                );
+
+                return;
+            }
+
+            // 지원되는 브라우저에서는 현재 위치 권한 상태를 확인
+            if (
+                navigator.permissions &&
+                navigator.permissions.query
+            ) {
+                try {
+                    const permission =
+                        await navigator.permissions.query({
+                            name: "geolocation"
+                        });
+
+                    if (permission.state === "granted") {
+                        setPermissionStatus(
+                            "브라우저 위치 권한이 이미 허용되어 있어요. " +
+                            "버튼을 눌러 위치를 확인할게요."
+                        );
+                    } else if (permission.state === "prompt") {
+                        setPermissionStatus(
+                            "시작 버튼을 누르면 브라우저에서 위치 접근을 " +
+                            "허용할지 물어볼 수 있어요."
+                        );
+                    } else if (permission.state === "denied") {
+                        setPermissionStatus(
+                            "현재 이 사이트의 위치 권한이 차단되어 있어요. " +
+                            "주소창 왼쪽의 사이트 설정에서 위치를 허용한 뒤 " +
+                            "다시 시도해 주세요."
+                        );
+                    }
+                } catch (error) {
+                    // 권한 상태 조회가 지원되지 않아도 실제 위치 요청은 시도
+                    setPermissionStatus(
+                        "시작 버튼을 누르면 브라우저의 위치 요청을 시도해요."
+                    );
+                }
+            } else if (window.isSecureContext) {
+                setPermissionStatus(
+                    "시작 버튼을 누르면 브라우저에서 위치 접근을 " +
+                    "허용할지 물어볼 수 있어요."
+                );
+            }
+        }
+
+
+        // 위치를 받은 후 지도를 시작
+        function startAppWithLocation(position) {
+            // SDK를 불러오기 전에는 위도와 경도 숫자만 저장
+            currentLatitude = position.coords.latitude;
+            currentLongitude = position.coords.longitude;
+            currentPosition = null;
+
+            currentAccuracyMeters =
+                Number(position.coords.accuracy);
+
+            locationReady = true;
+            hasRealLocation = true;
+
+            if (Number.isFinite(currentAccuracyMeters)) {
+                const accuracyText =
+                    formatAccuracy(currentAccuracyMeters);
+
+                locationDescription =
+                    currentAccuracyMeters >= 1000
+                        ? "대략적인 위치 기준(기기 추정 오차 약 " +
+                          accuracyText + ")"
+                        : "현재 위치 기준(기기 추정 오차 약 " +
+                          accuracyText + ")";
+            } else {
+                locationDescription =
+                    "현재 위치 기준(오차 범위 확인 불가)";
+            }
+
+            // 위치 확인이 끝나면 시작 화면을 닫고 SDK 로드
+            startOverlay.style.display = "none";
+
+            setStatus(
+                locationDescription +
+                ". 주변 시설을 불러오는 중이에요."
+            );
+
+            loadKakaoSDK();
+        }
+
+
+        // 시작 단계에서 위치 정보를 가져오지 못했을 때 오류 안내
+        function handleStartupLocationError(error) {
+            allowLocationButton.disabled = false;
+            allowLocationButton.textContent = "위치 권한 다시 확인";
+
+            if (!window.isSecureContext) {
+                setPermissionStatus(
+                    "보안 연결이 아니어서 위치 기능이 차단되었을 수 있어요. " +
+                    "localhost 또는 HTTPS에서 실행해 주세요. " +
+                    "그래도 안 되면 서울시청 기준으로 시작할 수 있어요."
+                );
+
+                return;
+            }
+
+            if (error && error.code === error.PERMISSION_DENIED) {
+                setPermissionStatus(
+                    "위치 권한이 거부되었어요. 주소창 왼쪽의 사이트 설정에서 " +
+                    "위치 권한을 허용한 뒤 다시 시도해 주세요. " +
+                    "또는 위치 없이 서울시청 기준으로 시작할 수 있어요."
+                );
+            } else if (
+                error && error.code === error.POSITION_UNAVAILABLE
+            ) {
+                setPermissionStatus(
+                    "기기에서 위치 정보를 받을 수 없어요. " +
+                    "기기의 위치 서비스와 Wi-Fi를 확인하거나 " +
+                    "서울시청 기준으로 시작해 주세요."
+                );
+            } else if (
+                error && error.code === error.TIMEOUT
+            ) {
+                setPermissionStatus(
+                    "20초 안에 위치 정보를 받지 못했어요. " +
+                    "다시 시도하거나 서울시청 기준으로 시작해 주세요."
+                );
+            } else {
+                setPermissionStatus(
+                    "현재 위치를 확인하지 못했어요. " +
+                    "브라우저 권한과 기기 위치 설정을 확인해 주세요."
+                );
+            }
+        }
+
+
+        // 사용자가 시작 버튼을 누르면 지도 실행 전에 위치 접근 요청
+        function requestLocationBeforeStart() {
+            if (!navigator.geolocation) {
+                handleStartupLocationError(null);
+                return;
+            }
+
+            allowLocationButton.disabled = true;
+            fallbackButton.disabled = true;
+            allowLocationButton.textContent = "위치 확인 중…";
+
+            setPermissionStatus(
+                "브라우저의 위치 권한 요청을 기다리고 있어요."
+            );
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    allowLocationButton.disabled = false;
+                    fallbackButton.disabled = false;
+
+                    allowLocationButton.textContent =
+                        "현재 위치 허용하고 시작";
+
+                    startAppWithLocation(position);
+                },
+
+                function(error) {
+                    fallbackButton.disabled = false;
+                    handleStartupLocationError(error);
+                },
+
+                {
+                    enableHighAccuracy: true,
+                    timeout: 20000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+
+        // 위치 권한을 허용하지 않고 서울시청을 중심으로 앱 시작
+        function startWithoutLocation() {
+            // 지도 SDK 로드 후 좌표 객체로 변환할 수 있도록 숫자로 저장
+            currentLatitude = DEFAULT_LATITUDE;
+            currentLongitude = DEFAULT_LONGITUDE;
+            currentPosition = null;
+
+            currentAccuracyMeters = null;
+            locationReady = true;
+            hasRealLocation = false;
+
+            locationDescription =
+                "서울시청 기준(실제 현재 위치 아님)";
+
+            startOverlay.style.display = "none";
+
+            setStatus(
+                "서울시청을 중심으로 주변 시설을 검색할게요."
+            );
+
+            loadKakaoSDK();
+        }
+
+
+        // 지도 컨트롤 활성화
+        function enableControls() {
+            currentLocationButton.disabled = false;
+            trafficButton.disabled = false;
+
+            categoryTabs.forEach(function(tab) {
+                tab.disabled = false;
+            });
+        }
+
+
+        // 현재 위치 마커와 기기 추정 오차 범위를 지도에 표시
+        function updateLocationOnMap() {
+            if (!map || !currentPosition) {
+                return;
+            }
+
+            map.setCenter(currentPosition);
+            map.setLevel(5);
+
+            if (!currentLocationMarker) {
+                currentLocationMarker = new kakao.maps.Marker({
+                    position: currentPosition,
+                    title: hasRealLocation
+                        ? "내 현재 위치"
+                        : "서울시청(기본 위치)"
+                });
+            } else {
+                currentLocationMarker.setPosition(currentPosition);
+
+                currentLocationMarker.setTitle(
+                    hasRealLocation
+                        ? "내 현재 위치"
+                        : "서울시청(기본 위치)"
+                );
+            }
+
+            currentLocationMarker.setMap(map);
+
+            if (currentAccuracyCircle) {
+                currentAccuracyCircle.setMap(null);
+                currentAccuracyCircle = null;
+            }
+
+            // 실제 위치 정보에 오차 범위가 있을 때만 파란색 원 표시
+            if (
+                hasRealLocation &&
+                Number.isFinite(currentAccuracyMeters) &&
+                currentAccuracyMeters > 0
+            ) {
+                currentAccuracyCircle = new kakao.maps.Circle({
+                    center: currentPosition,
+                    radius: Math.max(currentAccuracyMeters, 10),
+                    strokeWeight: 2,
+                    strokeColor: "#2864dc",
+                    strokeOpacity: 0.8,
+                    strokeStyle: "solid",
+                    fillColor: "#2864dc",
+                    fillOpacity: 0.12
+                });
+
+                currentAccuracyCircle.setMap(map);
+            }
+        }
+
+
+        // 카카오맵 SDK가 준비된 후 실제 지도 생성
+        function initializeMap() {
+            // SDK가 준비된 다음 숫자 좌표를 지도 좌표 객체로 변환
+            currentPosition = new kakao.maps.LatLng(
+                currentLatitude,
+                currentLongitude
+            );
+
+            map = new kakao.maps.Map(
+                document.getElementById("map"),
+                {
+                    center: currentPosition,
+                    level: 5
+                }
+            );
+
+            placesService =
+                new kakao.maps.services.Places(map);
+
+            infoWindow = new kakao.maps.InfoWindow({
+                zIndex: 3
+            });
+
+            // 지도 확대와 축소 컨트롤 표시
+            const zoomControl = new kakao.maps.ZoomControl();
+
+            map.addControl(
+                zoomControl,
+                kakao.maps.ControlPosition.RIGHT
+            );
+
+            updateLocationOnMap();
+
+            // 지도 타일이 로드된 뒤에 검색 기능 시작
+            kakao.maps.event.addListener(
+                map,
+                "tilesloaded",
+                function() {
+                    if (mapReady) {
+                        return;
+                    }
+
+                    mapReady = true;
+                    enableControls();
+                    searchNearbyFacilities();
+                }
+            );
+
+            // 지도 로딩이 오래 걸릴 때 설정 확인 안내
+            window.setTimeout(function() {
+                if (!mapReady) {
+                    setStatus(
+                        "지도가 준비되지 않았어요. JavaScript 키와 " +
+                        "카카오 디벨로퍼스의 웹 도메인 설정을 확인해 주세요."
+                    );
+                }
+            }, 15000);
+        }
+
+
+        // SDK가 준비되면 지도 생성
+        function loadKakaoMap() {
+            if (
+                !window.kakao ||
+                !window.kakao.maps ||
+                typeof window.kakao.maps.load !== "function"
+            ) {
+                setStatus(
+                    "카카오맵 SDK를 불러오지 못했어요. " +
+                    "JavaScript 키와 도메인 설정을 확인해 주세요."
+                );
+
+                return;
+            }
+
+            kakao.maps.load(function() {
+                initializeMap();
+            });
+        }
+
+
+        // 카카오맵 JavaScript SDK를 한 번만 불러오기
+        function loadKakaoSDK() {
+            if (sdkStarted) {
+                return;
+            }
+
+            sdkStarted = true;
+
+            const script = document.createElement("script");
+
+            script.src =
+                "https://dapi.kakao.com/v2/maps/sdk.js?appkey=" +
+                encodeURIComponent(KAKAO_APP_KEY) +
+                "&libraries=services&autoload=false";
+
+            script.onload = loadKakaoMap;
+
+            script.onerror = function() {
+                setStatus(
+                    "카카오맵 SDK 로딩에 실패했어요. 인터넷 연결, " +
+                    "JavaScript 키, 등록된 웹 도메인을 확인해 주세요."
+                );
+
+                sdkStarted = false;
+            };
+
+            document.head.appendChild(script);
+        }
+
+
+        // 검색 결과 마커와 정보 팝업 지우기
+        function clearPlaceMarkers() {
+            placeMarkers.forEach(function(marker) {
+                marker.setMap(null);
+            });
+
+            placeMarkers = [];
+
+            if (infoWindow) {
+                infoWindow.close();
+            }
+        }
+
+
+        // 결과 목록에 안내 문구 표시
+        function showEmptyMessage(message) {
+            resultList.replaceChildren();
+
+            const item = document.createElement("li");
+            item.className = "empty-message";
+            item.textContent = message;
+
+            resultList.appendChild(item);
+        }
+
+
+        // 선택한 탭의 시설을 현재 위치 반경 5km에서 검색
+        function searchNearbyFacilities() {
+            if (
+                !mapReady ||
+                !placesService ||
+                !locationReady ||
+                !currentPosition
+            ) {
+                setStatus(
+                    "지도와 위치 정보가 준비될 때까지 기다려 주세요."
+                );
+
+                return;
+            }
+
+            // 이전 검색 결과가 새 결과를 덮어쓰지 않도록 요청 번호 관리
+            const requestId = ++searchRequestId;
+            const categoryName = getCategoryName(activeCategory);
+
+            clearPlaceMarkers();
+
+            showEmptyMessage(
+                "주변 " + categoryName + "을(를) 찾고 있어요."
+            );
+
+            setStatus(
+                locationDescription +
+                " 반경 5km 안의 " +
+                categoryName +
+                "을(를) 검색하고 있어요."
+            );
+
+            // PO3는 공공기관, CT1은 문화시설 카테고리 코드
+            placesService.categorySearch(
+                activeCategory,
+
+                function(places, status) {
+                    // 탭을 바꾼 뒤 도착한 이전 검색 결과는 무시
+                    if (requestId !== searchRequestId) {
+                        return;
+                    }
+
+                    if (
+                        status === kakao.maps.services.Status.OK
+                    ) {
+                        displayPlaces(places);
+
+                        setStatus(
+                            categoryName +
+                            " 검색 결과 " +
+                            places.length +
+                            "개를 표시하고 있어요. (" +
+                            locationDescription +
+                            ", 반경 5km, 한 페이지 최대 15개)"
+                        );
+                    } else if (
+                        status === kakao.maps.services.Status.ZERO_RESULT
+                    ) {
+                        showEmptyMessage(
+                            "반경 5km 안에 검색 결과가 없어요."
+                        );
+
+                        setStatus(
+                            locationDescription +
+                            " 반경 5km 안에서 " +
+                            categoryName +
+                            "을(를) 찾지 못했어요."
+                        );
+                    } else {
+                        showEmptyMessage(
+                            "검색 중 문제가 발생했어요. " +
+                            "잠시 후 다시 시도해 주세요."
+                        );
+
+                        setStatus(
+                            "시설 검색에 실패했어요. 네트워크나 " +
+                            "카카오맵 설정을 확인해 주세요."
+                        );
+                    }
+                },
+
+                {
+                    location: currentPosition,
+                    radius: SEARCH_RADIUS,
+                    sort: kakao.maps.services.SortBy.DISTANCE,
+                    size: 15
+                }
+            );
+        }
+
+
+        // 검색 결과를 지도 마커와 왼쪽 목록에 표시
+        function displayPlaces(places) {
+            resultList.replaceChildren();
+
+            places.forEach(function(place) {
+                const position = new kakao.maps.LatLng(
+                    Number(place.y),
+                    Number(place.x)
+                );
+
+                const address =
+                    place.road_address_name ||
+                    place.address_name ||
+                    "주소 정보가 없습니다.";
+
+                // 지도에 시설 마커 생성
+                const marker = new kakao.maps.Marker({
+                    map: map,
+                    position: position,
+                    title: place.place_name
+                });
+
+                placeMarkers.push(marker);
+
+                // 마커를 누르면 시설 이름과 주소 표시
+                kakao.maps.event.addListener(
+                    marker,
+                    "click",
+                    function() {
+                        showPlaceInfo(place, marker);
+                    }
+                );
+
+                // 왼쪽 결과 카드 생성
+                const item = document.createElement("li");
+                item.className = "place-card";
+
+                const placeButton =
+                    document.createElement("button");
+
+                placeButton.type = "button";
+                placeButton.className = "place-main";
+
+                const nameElement =
+                    document.createElement("span");
+
+                nameElement.className = "place-name";
+                nameElement.textContent = place.place_name;
+
+                const categoryElement =
+                    document.createElement("span");
+
+                categoryElement.className = "place-category";
+                categoryElement.textContent =
+                    place.category_name ||
+                    getCategoryName(activeCategory);
+
+                const addressElement =
+                    document.createElement("span");
+
+                addressElement.className = "place-address";
+                addressElement.textContent = address;
+
+                placeButton.append(
+                    nameElement,
+                    categoryElement,
+                    addressElement
+                );
+
+                // 목록을 누르면 지도 중심을 해당 시설로 이동
+                placeButton.addEventListener(
+                    "click",
+                    function() {
+                        showPlaceInfo(place, marker);
+                    }
+                );
+
+                item.appendChild(placeButton);
+                resultList.appendChild(item);
+            });
+        }
+
+
+        // 선택한 시설로 지도를 이동하고 이름과 주소를 팝업으로 표시
+        function showPlaceInfo(place, marker) {
+            const position = new kakao.maps.LatLng(
+                Number(place.y),
+                Number(place.x)
+            );
+
+            const address =
+                place.road_address_name ||
+                place.address_name ||
+                "주소 정보가 없습니다.";
+
+            map.panTo(position);
+
+            // 사용자에게 받은 장소 정보를 안전하게 텍스트로 표시
+            const popup = document.createElement("div");
+
+            popup.style.cssText =
+                "max-width:250px;padding:10px 12px;line-height:1.5;";
+
+            const name = document.createElement("div");
+
+            name.style.cssText =
+                "font-size:14px;font-weight:bold;margin-bottom:5px;";
+
+            name.textContent = place.place_name;
+
+            const addressText = document.createElement("div");
+
+            addressText.style.cssText =
+                "font-size:12px;color:#555;";
+
+            addressText.textContent = address;
+
+            popup.append(name, addressText);
+
+            infoWindow.setContent(popup);
+            infoWindow.open(map, marker);
+        }
+
+
+        // 탭을 바꾸면 기존 목록과 마커를 지우고 새 시설 검색
+        categoryTabs.forEach(function(tab) {
+            tab.addEventListener("click", function() {
+                activeCategory = tab.dataset.category;
+
+                categoryTabs.forEach(function(otherTab) {
+                    otherTab.setAttribute(
+                        "aria-selected",
+                        String(
+                            otherTab.dataset.category === activeCategory
+                        )
+                    );
+                });
+
+                searchNearbyFacilities();
+            });
+        });
+
+
+        // 앱 실행 후 현재 위치를 다시 요청하는 버튼
+        currentLocationButton.addEventListener(
+            "click",
+            function() {
+                if (
+                    !navigator.geolocation ||
+                    locationRequestInProgress
+                ) {
+                    return;
+                }
+
+                locationRequestInProgress = true;
+                currentLocationButton.disabled = true;
+                currentLocationButton.textContent = "위치 확인 중…";
+
+                setStatus("현재 위치를 다시 확인하고 있어요.");
+
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        locationRequestInProgress = false;
+                        currentLocationButton.disabled = false;
+                        currentLocationButton.textContent = "◎ 현재 위치";
+
+                        currentLatitude = position.coords.latitude;
+                        currentLongitude = position.coords.longitude;
+
+                        currentPosition = new kakao.maps.LatLng(
+                            currentLatitude,
+                            currentLongitude
+                        );
+
+                        currentAccuracyMeters =
+                            Number(position.coords.accuracy);
+
+                        hasRealLocation = true;
+
+                        const accuracyText =
+                            formatAccuracy(currentAccuracyMeters);
+
+                        locationDescription =
+                            currentAccuracyMeters >= 1000
+                                ? "대략적인 위치 기준(기기 추정 오차 약 " +
+                                  accuracyText + ")"
+                                : "현재 위치 기준(기기 추정 오차 약 " +
+                                  accuracyText + ")";
+
+                        updateLocationOnMap();
+                        searchNearbyFacilities();
+                    },
+
+                    function(error) {
+                        locationRequestInProgress = false;
+                        currentLocationButton.disabled = false;
+                        currentLocationButton.textContent = "◎ 현재 위치";
+
+                        if (error.code === error.PERMISSION_DENIED) {
+                            setStatus(
+                                "위치 권한이 거부되었어요. 주소창 왼쪽의 " +
+                                "사이트 설정에서 위치 권한을 허용해 주세요."
+                            );
+                        } else if (
+                            error.code === error.POSITION_UNAVAILABLE
+                        ) {
+                            setStatus(
+                                "기기에서 위치 정보를 받을 수 없어요. " +
+                                "기기의 위치 서비스와 Wi-Fi 설정을 확인해 주세요."
+                            );
+                        } else if (error.code === error.TIMEOUT) {
+                            setStatus(
+                                "위치 확인 시간이 초과되었어요. " +
+                                "현재 위치 버튼을 다시 눌러 주세요."
+                            );
+                        } else {
+                            setStatus(
+                                "현재 위치를 확인하지 못했어요."
+                            );
+                        }
+                    },
+
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 20000,
+                        maximumAge: 0
+                    }
+                );
+            }
+        );
+
+
+        // 교통정보 오버레이 켜기와 끄기
+        trafficButton.addEventListener("click", function() {
+            if (!mapReady) {
+                return;
+            }
+
+            trafficVisible = !trafficVisible;
+
+            if (trafficVisible) {
+                map.addOverlayMapTypeId(
+                    kakao.maps.MapTypeId.TRAFFIC
+                );
+
+                trafficButton.classList.add("active");
+                trafficButton.textContent = "교통정보 ON";
+
+                trafficButton.setAttribute(
+                    "aria-pressed",
+                    "true"
+                );
+
+                setStatus("지도에 교통정보를 표시하고 있어요.");
+            } else {
+                map.removeOverlayMapTypeId(
+                    kakao.maps.MapTypeId.TRAFFIC
+                );
+
+                trafficButton.classList.remove("active");
+                trafficButton.textContent = "교통정보 OFF";
+
+                trafficButton.setAttribute(
+                    "aria-pressed",
+                    "false"
+                );
+
+                setStatus("교통정보 표시를 껐어요.");
+            }
+        });
+
+
+        // 시작 화면의 버튼 이벤트 연결
+        allowLocationButton.addEventListener(
+            "click",
+            requestLocationBeforeStart
+        );
+
+        fallbackButton.addEventListener(
+            "click",
+            startWithoutLocation
+        );
+
+
+        // 페이지가 열리면 위치 권한 상태를 확인
+        // 실제 위치 접근 요청은 사용자가 시작 버튼을 누를 때 실행
+        document.addEventListener(
+            "DOMContentLoaded",
+            inspectLocationPermission
+        );
+    </script>
+</body>
+</html>
